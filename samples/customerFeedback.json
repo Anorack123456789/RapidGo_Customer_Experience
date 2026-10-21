@@ -1,0 +1,10 @@
+{
+  "event_id": "evt-000001",
+  "event_type": "customer_feedback",
+  "timestamp": "2026-10-22T14:30:00Z",
+  "order_id": "PED-1001",
+  "customer_id": "CLI-025",
+  "rating": 2,
+  "reason": "demora",
+  "channel": "app"
+}
