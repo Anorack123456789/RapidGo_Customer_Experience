@@ -50,6 +50,8 @@ services:
     volumes:
       - ./src:/opt/spark/work-dir/src
       - ./data:/opt/spark/work-dir/data
+      - ./spark:/opt/spark/work-dir/spark
+      - ./datalake:/opt/spark/work-dir/datalake
     depends_on:
       - kafka
 
@@ -63,6 +65,8 @@ services:
     volumes:
       - ./src:/opt/spark/work-dir/src
       - ./data:/opt/spark/work-dir/data
+      - ./spark:/opt/spark/work-dir/spark
+      - ./datalake:/opt/spark/work-dir/datalake
     depends_on:
       - spark-master
 
@@ -76,5 +80,7 @@ services:
     volumes:
       - ./src:/opt/spark/work-dir/src
       - ./data:/opt/spark/work-dir/data
+      - ./spark:/opt/spark/work-dir/spark
+      - ./datalake:/opt/spark/work-dir/datalake
     depends_on:
       - spark-master

@@ -1,0 +1,3 @@
+pytest
+kafka-python
+pyspark==4.2.0
