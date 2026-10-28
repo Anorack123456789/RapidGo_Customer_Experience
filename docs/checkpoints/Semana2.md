@@ -47,3 +47,13 @@ Para abordar el problema, se eliminó la caché temporal `/tmp/.ivy2` dentro del
 **Problema 3. Configuración de las conexiones de Kafka.**
 
 La configuración del productor utiliza `localhost:9092`, mientras que el consumidor de Spark se conecta a `kafka:19092`. Para que ambos componentes puedan comunicarse con el mismo broker, Kafka debe permitir el acceso desde el host y desde la red interna de Docker, mediante los puertos y los *listeners* correspondientes. Por esta razón, la verificación de la conectividad debe considerar la configuración del servicio en `docker-compose.yml`, el envío de mensajes desde el productor y la recepción efectiva de los eventos por parte de Spark.
+
+## 4. Validación automatizada y seguimiento del desarrollo
+
+La incorporación de GitHub Actions permitió establecer una base para la validación continua del código y de la configuración del proyecto. El flujo `CI RapidGo` automatiza la compilación sintáctica de los archivos Python, la ejecución de las pruebas definidas en el repositorio y la comprobación de la configuración de Docker Compose, reduciendo la necesidad de realizar estas verificaciones exclusivamente de forma manual.
+
+La ejecución del flujo depende de que las dependencias puedan instalarse correctamente desde `requirements.txt` y de que las pruebas automatizadas finalicen sin errores. Por tanto, la existencia del archivo `CI.yml` confirma la definición de estas comprobaciones, pero su funcionamiento efectivo debe respaldarse con ejecuciones satisfactorias del workflow en GitHub Actions.
+
+Como evidencias de la semana se consideran el productor de eventos, el script de procesamiento con Spark, la configuración de Docker Compose, el archivo de integración continua, los resultados de las pruebas automatizadas y los registros de ejecución del pipeline. También son relevantes los archivos Parquet generados, los metadatos de los checkpoints y las salidas de las métricas, siempre que se hayan obtenido durante las pruebas realizadas.
+
+En conjunto, durante la semana 2 se avanzó en la integración de la generación de eventos sintéticos con Kafka y PySpark, se incorporaron reglas para clasificar alertas y calcular métricas temporales, se establecieron mecanismos de persistencia y recuperación y se añadió una validación automatizada del repositorio mediante GitHub Actions. Estos componentes constituyen una base para continuar con las pruebas de integración, la verificación del comportamiento del pipeline y la mejora de los indicadores de experiencia del cliente.
