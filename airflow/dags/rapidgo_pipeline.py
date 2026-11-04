@@ -20,21 +20,21 @@ from airflow.sdk import dag, task
 RAW_PATH = Path(
     os.getenv(
         "RAPIDGO_RAW_PATH",
-        "/opt/airflow/data/datalake/eventos_procesados"
+        "/opt/airflow/datalake/eventos_procesados"
     )
 )
 
 CURATED_PATH = Path(
     os.getenv(
         "RAPIDGO_CURATED_PATH",
-        "/opt/airflow/data/datalake/curated"
+        "/opt/airflow/datalake/curated"
     )
 )
 
 REPORT_PATH = Path(
     os.getenv(
         "RAPIDGO_REPORT_PATH",
-        "/opt/airflow/data/reports"
+        "/opt/airflow/datalake/reports"
     )
 )
 

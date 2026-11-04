@@ -1,4 +1,0 @@
-v1
-{"path":"file:///opt/spark/work-dir/data/datalake/raw/part-00000-d32682b4-2fdf-428b-85c5-3a21b44b0da9-c000.snappy.parquet","size":3123,"isDir":false,"modificationTime":1792875620577,"blockReplication":1,"blockSize":33554432,"action":"add"}
-{"path":"file:///opt/spark/work-dir/data/datalake/raw/part-00001-b09561f5-298e-47f0-86ac-0af14a31f73d-c000.snappy.parquet","size":3311,"isDir":false,"modificationTime":1792875621253,"blockReplication":1,"blockSize":33554432,"action":"add"}
-{"path":"file:///opt/spark/work-dir/data/datalake/raw/part-00002-ecc5dd67-7d87-44be-a8cd-41412c57a6ae-c000.snappy.parquet","size":3365,"isDir":false,"modificationTime":1792875621251,"blockReplication":1,"blockSize":33554432,"action":"add"}
