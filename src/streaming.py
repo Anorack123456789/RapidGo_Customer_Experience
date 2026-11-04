@@ -4,8 +4,8 @@ import time
 TOPIC = "rapidgo.customer_feedback"
 KAFKA = "kafka:19092"
 
-DATALAKE_DIR = "/opt/spark/work-dir/datalake"
-CHECKPOINTS_DIR = "/opt/spark/work-dir/docs/checkpoints"
+DATALAKE_DIR = "/opt/spark/work-dir/data/datalake"
+CHECKPOINTS_DIR = "/opt/spark/work-dir/data/checkpoints"
 
 spark = (SparkSession.builder
     .appName("RapidGo_CustomerExperience")
@@ -48,10 +48,10 @@ processed = (parsed
          .when(F.col("nivel_alerta") == "ALERTA_CRITICA", "MOTIVO_GRAVE")
          .otherwise("SIN_ALERTA")))
 
-EVENTOS = f"{DATALAKE_DIR}/eventos_procesados"
-ALERTAS = f"{DATALAKE_DIR}/alertas"
-CP_EVENTOS = f"{CHECKPOINTS_DIR}/eventos"
-CP_METRICAS = f"{CHECKPOINTS_DIR}/metricas"
+EVENTOS = f"{DATALAKE_DIR}/processed"
+ALERTAS = f"{DATALAKE_DIR}/curated/alertas"
+CP_EVENTOS = f"{CHECKPOINTS_DIR}/processed"
+CP_METRICAS = f"{CHECKPOINTS_DIR}/rating"
 
 def procesar_batch(batch_df, batch_id):
     if batch_df.isEmpty():
