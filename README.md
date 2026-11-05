@@ -44,7 +44,7 @@ Los eventos serán generados en formato JSON y publicados en Kafka; posteriormen
 
 ## Estado del proyecto
 
-**Primera semana:** Diseño de arquitectura, definición del contrato de eventos, especificación de KPIs y alertas, organización del repositorio y documentación de decisiones técnicas.
+*Tercera semana:* Implementación de la capa de orquestación analítica con Apache Airflow, estabilización de la infraestructura de Kafka y sus particiones, persistencia de la capa de datos crudos (Raw) mediante Spark Streaming, automatización de permisos compartidos en el Data Lake, ampliación de la integración continua para la validación de DAGs y prueba de error controlado.
 
 ## Integrantes
 
