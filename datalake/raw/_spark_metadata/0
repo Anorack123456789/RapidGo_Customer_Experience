@@ -1,0 +1,2 @@
+v1
+{"path":"file:///opt/spark/work-dir/datalake/raw/part-00000-7a6d279b-f9f5-4149-aa9a-a3fbe5b515f7-c000.snappy.parquet","size":751,"isDir":false,"modificationTime":1793839216321,"blockReplication":1,"blockSize":33554432,"action":"add"}

@@ -28,58 +28,58 @@ services:
     container_name: rapidgo-kafka-init
     depends_on:
       - kafka
-    entrypoint: [ '/bin/sh', '-c' ]
-    command: |
-      "
-      echo 'Esperando a que Kafka inicie...'
-      sleep 15
-      echo 'Creando tópico rapidgo.customer_feedback con 3 particiones...'
-      /opt/kafka/bin/kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:19092 --partitions 3 --replication-factor 1 --topic rapidgo.customer_feedback
-      echo 'Configuración de Kafka completada.'
-      "
+    command:
+      - bash
+      - -c
+      - |
+        echo "Esperando a que Kafka inicie..."
+        while ! /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:19092 --list; do
+          echo "Kafka no está listo aún. Reintentando en 3 segundos..."
+          sleep 3
+        done
+        echo "Kafka está listo. Creando tópico rapidgo.customer_feedback con 3 particiones..."
+        /opt/kafka/bin/kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:19092 --partitions 3 --replication-factor 1 --topic rapidgo.customer_feedback
+        echo "Configuración de Kafka completada."
       
   init-permissions:
     image: alpine:3.22
     container_name: rapidgo-init-permissions
     user: "0:0"
     volumes:
-      - ./data:/data
+      - ./datalake:/datalake
+      - spark-ivy:/ivy
     entrypoint:
       - /bin/sh
       - -c
       - |
         set -e
 
-        echo "Preparando directorios compartidos..."
+        mkdir -p /datalake/raw
+        mkdir -p /datalake/processed
+        mkdir -p /datalake/curated/alertas
+        mkdir -p /datalake/curated/kpis
+        mkdir -p /datalake/checkpoints/processed
+        mkdir -p /datalake/checkpoints/rating
+        mkdir -p /datalake/reports
 
-        mkdir -p /data/datalake/raw
-        mkdir -p /data/datalake/processed
-        mkdir -p /data/datalake/curated
-        mkdir -p /data/checkpoints
-        mkdir -p /data/reports
+        mkdir -p /ivy/cache /ivy/jars
+        chown -R 185:185 /ivy
+        chmod -R 775 /ivy
 
-        echo "Asignando el grupo compartido 185..."
+        chown -R 185:185 /datalake
+        chmod -R g+rwX /datalake
 
-        chown -R 185:185 /data/datalake
-        chown -R 185:185 /data/checkpoints
+        find /datalake -type d -exec chmod g+s {} \;
 
-        echo "Configurando permisos..."
-
-        chmod -R g+rwX /data/datalake
-        chmod -R g+rwX /data/checkpoints
-
-        find /data/datalake -type d -exec chmod g+s {} \;
-        find /data/checkpoints -type d -exec chmod g+s {} \;
-
-        chown -R 50000:0 /data/reports
-        chmod -R u+rwX /data/reports
-
-        echo "Inicializacion de permisos completada."
+        echo "Permisos del Data Lake configurados."
 
   spark-master:
     image: spark:4.2.0-python3
     hostname: spark-master
     container_name: rapidgo-spark-master
+    environment:
+      HOME: /opt/spark
+      SPARK_SUBMIT_OPTS: "-Duser.home=/opt/spark"
     command:
       - /bin/sh
       - -c
@@ -90,10 +90,9 @@ services:
       - "7077:7077"
       - "8080:8080"
     volumes:
-      - ./src:/opt/spark/work-dir/src
-      - ./data:/opt/spark/work-dir/data
       - ./spark:/opt/spark/work-dir/spark
       - ./datalake:/opt/spark/work-dir/datalake
+      - spark-ivy:/opt/spark/.ivy2.5.2
     depends_on:
       kafka:
         condition: service_started
@@ -104,19 +103,20 @@ services:
     image: spark:4.2.0-python3
     hostname: spark-worker-1
     container_name: rapidgo-spark-worker-1
+    environment:
+      HOME: /opt/spark
     command:
       - /bin/sh
       - -c
       - |
         umask 0002
-        exec /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 --cores 1 --memory 768m --webui-port 8081
+        exec /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 --cores 2 --memory 2g --webui-port 8081
     ports:
       - "8081:8081"
     volumes:
-      - ./src:/opt/spark/work-dir/src
-      - ./data:/opt/spark/work-dir/data
       - ./spark:/opt/spark/work-dir/spark
       - ./datalake:/opt/spark/work-dir/datalake
+      - spark-ivy:/opt/spark/.ivy2.5.2
     depends_on:
       spark-master:
         condition: service_started
@@ -125,19 +125,20 @@ services:
     image: spark:4.2.0-python3
     hostname: spark-worker-2
     container_name: rapidgo-spark-worker-2
+    environment:
+      HOME: /opt/spark
     command:
       - /bin/sh
       - -c
       - |
         umask 0002
-        exec /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 --cores 1 --memory 768m --webui-port 8081
+        exec /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 --cores 2 --memory 2g --webui-port 8081
     ports:
       - "8082:8081"
     volumes:
-      - ./src:/opt/spark/work-dir/src
-      - ./data:/opt/spark/work-dir/data
       - ./spark:/opt/spark/work-dir/spark
       - ./datalake:/opt/spark/work-dir/datalake
+      - spark-ivy:/opt/spark/.ivy2.5.2
     depends_on:
       spark-master:
         condition: service_started
@@ -157,12 +158,15 @@ services:
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__DEFAULT_TIMEZONE: "America/Bogota"
-      RAPIDGO_RAW_PATH: "/opt/airflow/data/datalake/processed"
-      RAPIDGO_CURATED_PATH: "/opt/airflow/data/datalake/curated"
-      RAPIDGO_REPORT_PATH: "/opt/airflow/data/reports"
+      RAPIDGO_RAW_PATH: "/opt/airflow/datalake/processed"
+      RAPIDGO_CURATED_PATH: "/opt/airflow/datalake/curated"
+      RAPIDGO_REPORT_PATH: "/opt/airflow/datalake/reports"
     volumes:
       - ./airflow:/opt/airflow
-      - ./data:/opt/airflow/data
+      - ./datalake:/opt/airflow/datalake
     depends_on:
       init-permissions:
         condition: service_completed_successfully
+
+volumes:
+  spark-ivy:

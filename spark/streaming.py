@@ -26,6 +26,27 @@ raw = (spark.readStream
     .option("startingOffsets", "latest")
     .load())
 
+RAW = f"{DATALAKE_DIR}/raw"
+EVENTOS = f"{DATALAKE_DIR}/processed"
+ALERTAS = f"{DATALAKE_DIR}/curated/alertas"
+
+CP_RAW = f"{CHECKPOINTS_DIR}/raw"
+CP_EVENTOS = f"{CHECKPOINTS_DIR}/processed"
+CP_METRICAS = f"{CHECKPOINTS_DIR}/rating"
+
+q_raw = (raw
+    .selectExpr(
+        "CAST(key AS STRING) AS kafka_key",
+        "CAST(value AS STRING) AS json_value",
+        "topic", "partition", "offset", "timestamp"
+    )
+    .writeStream
+    .format("parquet")
+    .option("path", RAW)
+    .option("checkpointLocation", CP_RAW)
+    .trigger(processingTime="5 seconds")
+    .start())
+
 parsed = (raw
     .selectExpr(
         "CAST(key AS STRING) AS kafka_key",
@@ -48,11 +69,6 @@ processed = (parsed
          .when(F.col("nivel_alerta") == "ALERTA_CRITICA", "MOTIVO_GRAVE")
          .otherwise("SIN_ALERTA")))
 
-EVENTOS = f"{DATALAKE_DIR}/processed"
-ALERTAS = f"{DATALAKE_DIR}/curated/alertas"
-CP_EVENTOS = f"{CHECKPOINTS_DIR}/processed"
-CP_METRICAS = f"{CHECKPOINTS_DIR}/rating"
-
 def procesar_batch(batch_df, batch_id):
     if batch_df.isEmpty():
         return
@@ -65,7 +81,12 @@ def procesar_batch(batch_df, batch_id):
         F.count("*").alias("eventos")
     ).orderBy("partition").show(truncate=False)
     
-    batch_df.write.mode("append").parquet(EVENTOS)
+    eventos_salida = (
+    batch_df
+    .withColumn("reason", F.col("motivo"))
+    .withColumn("timestamp", F.col("timestamp_ms").cast("string"))
+    )
+    eventos_salida.write.mode("append").parquet(EVENTOS)
 
     alertas = batch_df.filter(F.col("nivel_alerta") != "NORMAL")
     if not alertas.isEmpty():
@@ -101,13 +122,14 @@ try:
         time.sleep(10)
         progreso = q_eventos.lastProgress
         if progreso:
-            print("PROGRESO:", {
+            print("PROGRESO EVENTOS:", {
                 "batchId": progreso.get("batchId"),
                 "processedRowsPerSecond": progreso.get("processedRowsPerSecond"),
             })
 except KeyboardInterrupt:
     print("Deteniendo consultas...")
 finally:
+    q_raw.stop()
     q_eventos.stop()
     q_metricas.stop()
     spark.stop()
