@@ -30,3 +30,30 @@ Para solucionar los problemas de acceso entre contenedores se incorporó `init-p
 Se presentaron dos dificultades principales durante la implementación. La primera correspondió a una incompatibilidad entre los nombres de las columnas esperadas por Airflow y el esquema real de los archivos Parquet; se corrigieron las columnas utilizadas en las validaciones y agregaciones.
 
 La segunda dificultad fue un error `PermissionError` cuando Airflow intentó escribir resultados en `datalake/curated`, debido a las diferencias entre los usuarios de los contenedores. Para solucionarlo se implementó el servicio `init-permissions`, se configuró el grupo compartido y se ajustaron los permisos de los directorios. También se corrigieron las pruebas de escritura en Spark para utilizar `python3`, que es el ejecutable disponible en sus contenedores.
+
+### 5. Issues, Pull Requests y evidencias relacionadas
+
+- **DAG:** `airflow/dags/rapidgo_pipeline.py`.
+- **Configuración de servicios:** `docker-compose.yml`.
+- **Configuración de Airflow:** `airflow/Dockerfile`.
+- **Integración continua:** `.github/workflows/CI.yml`.
+- **Dependencias:** `requirements.txt`.
+- **Datos procesados:** `datalake/processed/`.
+- **Resultados agregados:** `datalake/curated/`.
+- **Reportes:** `datalake/reports/`.
+- **Permisos:** registros del contenedor `rapidgo-init-permissions`.
+- **Orquestación:** registros de ejecución del DAG en la interfaz de Airflow.
+
+### 6. Fallo controlado y recuperación
+
+Para evaluar la resiliencia del pipeline y la gestión de dependencias, se simuló un error de calidad de datos introduciendo un campo inexistente (`columna_falsa_para_fallo`) en la lista de columnas requeridas del DAG.
+
+* **Tarea que falló:** `validate_raw`
+* **Mensaje real del log:** `4 [2026-11-05 16:12:44] ERROR - Task failed with exception
+▼ValueError: Columnas faltantes en /opt/airflow/datalake/processed/part-00000-59f2f946-a882-4fbb-9e34-e978470609c2-c000.snappy.parquet: {'columna_falsa_para_fallo'}`
+* **Tareas afectadas:** Al fallar la validación, Airflow detuvo el flujo e impidió la ejecución de las tareas dependientes quedaron en estado `upstream_failed`: `aggregate_kpis`, `validate_curated` y `generate_report`.
+* **Cambio que resolvió el problema:** Se corrigió el código eliminando la columna falsa del esquema esperado.
+* **Recuperación:** Se utilizó la funcionalidad **Clear** de Airflow sobre la tarea `validate_raw`. El orquestador reanudó el flujo desde ese punto exacto utilizando el código corregido, ejecutando exitosamente el resto del pipeline sin necesidad de reiniciar la tarea `check_sources`.
+* **Evidencia:** Todo el proceso quedo documentado en la rama `feature/Error_controlado` y no se realizo pull request para no implementar codigo erroneo en la rama principal.
+
+**Estado de la semana:** Implementación realizada y validaciones parciales satisfactorias. Quedan pendientes la evidencia de una ejecución completa exitosa del DAG, una prueba de fallo controlado con su recuperación y la confirmación de una ejecución satisfactoria del workflow actualizado de GitHub Actions.
