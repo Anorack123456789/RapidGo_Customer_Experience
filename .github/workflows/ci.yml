@@ -35,30 +35,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt "apache-airflow==${AIRFLOW_VERSION}" --constraint "${AIRFLOW_CONSTRAINT_URL}"
+          pip install pyarrow
 
       - name: Validar sintaxis Python
         run: |
           python -m compileall -q producer spark test src airflow/dags
-
-
-  name: Validar DAG
-on: [push, pull_request]
-
-jobs:
-  validate-dag:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Instalar Airflow y dependencias
-        run: |
-          pip install "apache-airflow==3.3.2" \
-            --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-3.3.2/constraints-3.11.txt"
-          pip install pyarrow
 
       - name: Validar importación y estructura del DAG
         run: |
