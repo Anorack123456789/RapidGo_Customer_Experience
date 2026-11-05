@@ -39,3 +39,74 @@ jobs:
       - name: Validar sintaxis Python
         run: |
           python -m compileall -q producer spark test src airflow/dags
+
+
+  name: Validar DAG
+on: [push, pull_request]
+
+jobs:
+  validate-dag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar Airflow y dependencias
+        run: |
+          pip install "apache-airflow==3.3.2" \
+            --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-3.3.2/constraints-3.11.txt"
+          pip install pyarrow
+
+      - name: Validar importación y estructura del DAG
+        run: |
+          python - <<'PY'
+          import sys
+          from airflow.models import DagBag
+
+          dag_bag = DagBag(dag_folder="airflow/dags")
+
+          if dag_bag.import_errors:
+              for file, error in dag_bag.import_errors.items():
+                  print(f"ERROR al importar {file}:")
+                  print(error)
+              raise SystemExit(1)
+
+          dag_id = "rapidgo_customer_experience_pipeline"
+          dag = dag_bag.dags.get(dag_id)
+
+          if dag is None:
+              raise SystemExit(f"No se encontró el DAG: {dag_id}")
+
+          required_tasks = {
+              "check_sources", "validate_raw", "aggregate_kpis",
+              "validate_curated", "generate_report",
+          }
+          actual_tasks = set(dag.task_ids)
+          missing = required_tasks - actual_tasks
+          if missing:
+              raise SystemExit(f"Faltan tareas: {missing}")
+
+          required_deps = [
+              ("check_sources", "validate_raw"),
+              ("validate_raw", "aggregate_kpis"),
+              ("aggregate_kpis", "validate_curated"),
+              ("validate_curated", "generate_report"),
+          ]
+          for up, down in required_deps:
+              task = dag.get_task(up)
+              if down not in task.downstream_task_ids:
+                  raise SystemExit(f"Dependencia faltante: {up} -> {down}")
+
+          print(f"DAG validado: {dag_id}")
+          print(f"Total de tareas: {len(actual_tasks)}")
+          print("Dependencias verificadas correctamente.")
+          PY
+
+      - name: Ejecutar pruebas
+        run: pytest -v
+
+      - name: Validar Docker Compose
+        run: docker compose config --quiet
