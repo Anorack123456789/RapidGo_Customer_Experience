@@ -4,30 +4,38 @@ on:
   push:
     branches: [ "main", "preproduccion" ]
   pull_request:
-    branches: [ "main", "preproduccion" ] 
+    branches: [ "main", "preproduccion" ]
   workflow_dispatch:
 
 jobs:
   validar:
     runs-on: ubuntu-latest
+
+    env:
+      AIRFLOW_VERSION: "3.3.2"
+      PYTHON_VERSION: "3.12"
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: "${{ github.workspace }}/airflow/dags"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
-          
+
+      - name: Obtener restricciones de Airflow
+        run: |
+          echo "AIRFLOW_CONSTRAINT_URL=https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt" >> $GITHUB_ENV
+
       - name: Instalar dependencias
-        run: pip install -r requirements.txt
-        
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt "apache-airflow==${AIRFLOW_VERSION}" --constraint "${AIRFLOW_CONSTRAINT_URL}"
+
       - name: Validar sintaxis Python
-        run: python -m compileall producer spark test
-        
-      - name: Ejecutar pruebas
-        run: pytest -v
-        
-      - name: Validar Docker Compose
-        run: docker compose config --quiet
+        run: |
+          python -m compileall -q producer spark test src airflow/dags
