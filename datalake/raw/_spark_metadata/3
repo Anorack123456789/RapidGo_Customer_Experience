@@ -1,0 +1,4 @@
+v1
+{"path":"file:///opt/spark/work-dir/datalake/raw/part-00000-200de0b6-9846-4bff-ae5f-60519fc02ccf-c000.snappy.parquet","size":2678,"isDir":false,"modificationTime":1793839293422,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///opt/spark/work-dir/datalake/raw/part-00001-7d6043ec-0eb2-4f20-905a-9904fa1b6247-c000.snappy.parquet","size":2685,"isDir":false,"modificationTime":1793839292978,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///opt/spark/work-dir/datalake/raw/part-00002-20802f96-d12e-47f7-afe5-1cdf45f4fc0e-c000.snappy.parquet","size":2796,"isDir":false,"modificationTime":1793839293555,"blockReplication":1,"blockSize":33554432,"action":"add"}
