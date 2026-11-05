@@ -44,7 +44,7 @@ REQUIRED_COLUMNS = [
     "reason",
     "timestamp",
     "event_time",
-    "columna_falsa_para_fallo",
+    #"columna_falsa_para_fallo",
 ]
 
 AGGREGATION_COLUMNS = [
