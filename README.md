@@ -93,3 +93,14 @@ docker logs rapidgo-airflow | grep -i password
 
 * **Pruebas Locales:** Ejecutar el framework de pruebas de Python en la raíz del proyecto mediante el comando `pytest -v`.
 * **GitHub Actions:** El flujo de CI se dispara automáticamente ante eventos `push` o `pull_request`. Para ejecutarlo manualmente y cumplir con el Quality Gate, ir a la pestaña Actions en GitHub, seleccionar el workflow CI RapidGo, y hacer clic en Run workflow (`workflow_dispatch`).
+
+## 7. Resultados o evidencias representativas
+
+* **Persistencia:** Archivos Parquet generados correctamente en las rutas físicas locales `datalake/raw/`, `datalake/processed/` y `datalake/curated/`.
+* **Reportes:** Generación automática de resúmenes en Markdown (`datalake/reports/rapidgo_report_*.md`) tras la ejecución del DAG.
+* **Resiliencia:** Recuperación exitosa del pipeline documentada en un escenario de fallo controlado.
+
+## 8. Limitaciones conocidas y trabajo futuro
+
+* **Limitaciones:** La orquestación de Airflow se encuentra desplegada en modo `standalone`, lo cual no es apto para entornos de alta disponibilidad. Los umbrales de alerta actualmente son estáticos.
+* **Trabajo futuro:** Migrar los cálculos estáticos hacia alertas dinámicas basadas en modelos de machine learning, implementar particionado de datos lógico por fecha `date=YYYY-MM-DD` en la capa Curated, e integrar herramientas de visualización de datos de terceros.
