@@ -77,3 +77,19 @@ python producer/producer.py
 docker exec -it rapidgo-spark-master /opt/spark/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.2.0 /opt/spark/work-dir/spark/streaming.py
 
 ```
+## 5. Cómo acceder a Airflow y ejecutar el DAG
+
+**1. Acceder a la interfaz web ingresando a** `http://localhost:8083` **en el navegador.**\
+**2. Obtener la contraseña generada automáticamente ejecutando:**
+```bash
+docker logs rapidgo-airflow | grep -i password
+
+```
+3. **Iniciar sesión con el usuario** `admin` **y la contraseña obtenida.**
+4. **Localizar el DAG** `rapidgo_customer_experience_pipeline`.
+5. **Activar el DAG y hacer clic en <u>Trigger DAG</u> para ejecutar el pipeline de validación y reporting.**
+
+## 6. Cómo ejecutar pruebas y GitHub Actions
+
+* **Pruebas Locales:** Ejecutar el framework de pruebas de Python en la raíz del proyecto mediante el comando `pytest -v`.
+* **GitHub Actions:** El flujo de CI se dispara automáticamente ante eventos `push` o `pull_request`. Para ejecutarlo manualmente y cumplir con el Quality Gate, ir a la pestaña Actions en GitHub, seleccionar el workflow CI RapidGo, y hacer clic en Run workflow (`workflow_dispatch`).
