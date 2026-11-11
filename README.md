@@ -104,3 +104,14 @@ docker logs rapidgo-airflow | grep -i password
 
 * **Limitaciones:** La orquestación de Airflow se encuentra desplegada en modo `standalone`, lo cual no es apto para entornos de alta disponibilidad. Los umbrales de alerta actualmente son estáticos.
 * **Trabajo futuro:** Migrar los cálculos estáticos hacia alertas dinámicas basadas en modelos de machine learning, implementar particionado de datos lógico por fecha `date=YYYY-MM-DD` en la capa Curated, e integrar herramientas de visualización de datos de terceros.
+## 9. Tabla de contribuciones
+
+| Integrante | Usuario GitHub | Responsabilidades | Issues / PRs principales |
+| --- | --- | --- | --- |
+| **Jeison Sanchez** | `Anorack123456789` | Diseño de arquitectura base, productor Kafka, documentación ADR-001. | *[Enlace a PR #X]* |
+| **Jaime Florez** | `DipUwU` | Pipeline de Spark Streaming, capas de Data Lake, ajustes de permisos. | *[Enlace a PR #Y]* |
+| **Andres Triana** | `feTtros` | Orquestación en Airflow, GitHub Actions, validaciones DagBag. | *[Enlace a PR #Z]* |
+
+## 10. Enlace al video final
+
+📺 [Ver video de demostración de RapidGo - Variante 7](https://www.google.com/search?q=URL_DEL_VIDEO_AQUI)
