@@ -25,3 +25,30 @@ El pipeline está diseñado bajo una arquitectura de datos en streaming y orques
 * **Apache Airflow 3.3.2:** Orquestación, control de calidad, agregación de KPIs y generación de reportes.
 * **Docker & Docker Compose:** Contenerización y despliegue local de la infraestructura.
 * **GitHub Actions:** Integración continua, validación de sintaxis, pruebas automatizadas y releases.
+## 3. Topics, Eventos, KPIs y Reglas principales
+
+* **Topic:** `rapidgo.customer_feedback` (3 particiones).
+* **Estructura del JSON**
+```json
+{
+  "order_id": "uuid",
+  "rating": 3,
+  "motivo": "demora",
+  "timestamp_ms": 1730000000000
+}
+
+```
+## Indicadores KPIs:
+
+| KPI | Unidad de medida | Ventana inicial | Propósito |
+| --- | --- | --- | --- |
+| Calificación media del cliente | Puntos de 1 a 5 | 1 minuto | Evaluar la satisfacción general |
+| Motivos frecuentes de insatisfacción | Cantidad de opiniones negativas por motivo | 1 minuto | Identificar problemas recurrentes |
+| Tendencia de satisfacción | Diferencia en puntos | Dos ventanas consecutivas de 1 minuto | Detectar cambios en la satisfacción |
+
+## Alertas
+
+| Nombre de la alerta | Objetivo | Condición de activación | Datos utilizados | Acción esperada |
+| --- | --- | --- | --- | --- |
+| Caída de satisfacción | Detectar una disminución en la satisfacción general de los clientes. | La calificación media de una ventana de 1 min es inferior a 3,5 sobre 5. | Calificaciones (`rating`) y marcas temporales (`timestamp`). | Generar una alerta que registre la calificación media obtenida y la ventana temporal. |
+| Concentración de reclamos | Identificar un incremento de opiniones negativas asociadas con un mismo motivo. | Se registran 5+ opiniones con calificación <= 2, asociadas al mismo motivo, durante 1 min. | Calificaciones (`rating`), motivos (`reason`) y marcas temporales (`timestamp`). | Generar una alerta que identifique el motivo del reclamo y la cantidad de opiniones negativas. |
