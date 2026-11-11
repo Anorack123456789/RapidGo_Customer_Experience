@@ -52,3 +52,28 @@ El pipeline está diseñado bajo una arquitectura de datos en streaming y orques
 | --- | --- | --- | --- | --- |
 | Caída de satisfacción | Detectar una disminución en la satisfacción general de los clientes. | La calificación media de una ventana de 1 min es inferior a 3,5 sobre 5. | Calificaciones (`rating`) y marcas temporales (`timestamp`). | Generar una alerta que registre la calificación media obtenida y la ventana temporal. |
 | Concentración de reclamos | Identificar un incremento de opiniones negativas asociadas con un mismo motivo. | Se registran 5+ opiniones con calificación <= 2, asociadas al mismo motivo, durante 1 min. | Calificaciones (`rating`), motivos (`reason`) y marcas temporales (`timestamp`). | Generar una alerta que identifique el motivo del reclamo y la cantidad de opiniones negativas. |
+## 4. Prerrequisitos y Pasos para ejecutar localmente
+
+**Prerrequisitos:**
+
+* Docker y Docker Compose instalados.
+* Python 3.12+ (para pruebas o ejecución local del productor).
+
+**Pasos de ejecución:**
+
+**1. Clonar el repositorio y ubicarse en la raíz del proyecto.**\
+**2. Levantar la infraestructura (Kafka, Spark, Airflow, y creación de directorios):**
+```bash
+docker-compose up -d
+
+```
+**3. Iniciar el productor de eventos en una terminal:**
+```bash
+python producer/producer.py
+
+```
+**4. Iniciar el consumidor de Spark en una segunda terminal:**
+```bash
+docker exec -it rapidgo-spark-master /opt/spark/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.2.0 /opt/spark/work-dir/spark/streaming.py
+
+```
