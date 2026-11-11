@@ -106,11 +106,11 @@ docker logs rapidgo-airflow | grep -i password
 * **Trabajo futuro:** Migrar los cálculos estáticos hacia alertas dinámicas basadas en modelos de machine learning, implementar particionado de datos lógico por fecha `date=YYYY-MM-DD` en la capa Curated, e integrar herramientas de visualización de datos de terceros.
 ## 9. Tabla de contribuciones
 
-| Integrante | Usuario GitHub | Responsabilidades | PR principal |
+| Integrante | Usuario GitHub | Tareas Principales | PR principal |
 | --- | --- | --- | --- |
-| **Jeison Sanchez** | `Anorack123456789` | Diseño de arquitectura base, Crear Docker Compose, Configuracion Kafka | *[Enlace a PR #X]* |
-| **Jaime Florez** | `DipUwU` | Pipeline de Spark Streaming, Definicion contrato JSON, Creacion DAG | *[Enlace a PR #Y]* |
-| **Andres Triana** | `feTtros` | Creacion Tablero KanBan, Productor de eventos, Configuracion CI.yml | *[Enlace a PR #Z]* |
+| **Jeison Sanchez** | `Anorack123456789` | Diseño de arquitectura base, Crear Docker Compose, Configuracion Kafka | *[[Enlace a PR #22]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pull/22)* |
+| **Jaime Florez** | `DipUwU` | Pipeline de Spark Streaming, Definicion contrato JSON, Creacion DAG | *[[Enlace a PR #36]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pull/36)* |
+| **Andres Triana** | `feTtros` | Creacion Tablero KanBan, Productor de eventos, Configuracion CI.yml | *[[Enlace a PR #29]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pull/29)* |
 
 ## 10. Enlace al video final
 
