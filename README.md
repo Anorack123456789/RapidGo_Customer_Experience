@@ -52,3 +52,66 @@ El pipeline está diseñado bajo una arquitectura de datos en streaming y orques
 | --- | --- | --- | --- | --- |
 | Caída de satisfacción | Detectar una disminución en la satisfacción general de los clientes. | La calificación media de una ventana de 1 min es inferior a 3,5 sobre 5. | Calificaciones (`rating`) y marcas temporales (`timestamp`). | Generar una alerta que registre la calificación media obtenida y la ventana temporal. |
 | Concentración de reclamos | Identificar un incremento de opiniones negativas asociadas con un mismo motivo. | Se registran 5+ opiniones con calificación <= 2, asociadas al mismo motivo, durante 1 min. | Calificaciones (`rating`), motivos (`reason`) y marcas temporales (`timestamp`). | Generar una alerta que identifique el motivo del reclamo y la cantidad de opiniones negativas. |
+## 4. Prerrequisitos y Pasos para ejecutar localmente
+
+**Prerrequisitos:**
+
+* Docker y Docker Compose instalados.
+* Python 3.12+ (para pruebas o ejecución local del productor).
+
+**Pasos de ejecución:**
+
+**1. Clonar el repositorio y ubicarse en la raíz del proyecto.**\
+**2. Levantar la infraestructura (Kafka, Spark, Airflow, y creación de directorios):**
+```bash
+docker-compose up -d
+
+```
+**3. Iniciar el productor de eventos en una terminal:**
+```bash
+python producer/producer.py
+
+```
+**4. Iniciar el consumidor de Spark en una segunda terminal:**
+```bash
+docker exec -it rapidgo-spark-master /opt/spark/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.2.0 /opt/spark/work-dir/spark/streaming.py
+
+```
+## 5. Cómo acceder a Airflow y ejecutar el DAG
+
+**1. Acceder a la interfaz web ingresando a** `http://localhost:8083` **en el navegador.**\
+**2. Obtener la contraseña generada automáticamente ejecutando:**
+```bash
+docker logs rapidgo-airflow | grep -i password
+
+```
+3. **Iniciar sesión con el usuario** `admin` **y la contraseña obtenida.**
+4. **Localizar el DAG** `rapidgo_customer_experience_pipeline`.
+5. **Activar el DAG y hacer clic en <u>Trigger DAG</u> para ejecutar el pipeline de validación y reporting.**
+
+## 6. Cómo ejecutar pruebas y GitHub Actions
+
+* **Pruebas Locales:** Ejecutar el framework de pruebas de Python en la raíz del proyecto mediante el comando `pytest -v`.
+* **GitHub Actions:** El flujo de CI se dispara automáticamente ante eventos `push` o `pull_request`. Para ejecutarlo manualmente y cumplir con el Quality Gate, ir a la pestaña Actions en GitHub, seleccionar el workflow CI RapidGo, y hacer clic en Run workflow (`workflow_dispatch`).
+
+## 7. Resultados o evidencias representativas
+
+* **Persistencia:** Archivos Parquet generados correctamente en las rutas físicas locales `datalake/raw/`, `datalake/processed/` y `datalake/curated/`.
+* **Reportes:** Generación automática de resúmenes en Markdown (`datalake/reports/rapidgo_report_*.md`) tras la ejecución del DAG.
+* **Resiliencia:** Recuperación exitosa del pipeline documentada en un escenario de fallo controlado.
+
+## 8. Limitaciones conocidas y trabajo futuro
+
+* **Limitaciones:** La orquestación de Airflow se encuentra desplegada en modo `standalone`, lo cual no es apto para entornos de alta disponibilidad. Los umbrales de alerta actualmente son estáticos.
+* **Trabajo futuro:** Migrar los cálculos estáticos hacia alertas dinámicas basadas en modelos de machine learning, implementar particionado de datos lógico por fecha `date=YYYY-MM-DD` en la capa Curated, e integrar herramientas de visualización de datos de terceros.
+## 9. Tabla de contribuciones
+
+| Integrante | Usuario GitHub | Responsabilidades | Issues / PRs principales |
+| --- | --- | --- | --- |
+| **Jeison Sanchez** | `Anorack123456789` | Diseño de arquitectura base, productor Kafka, documentación ADR-001. | *[Enlace a PR #X]* |
+| **Jaime Florez** | `DipUwU` | Pipeline de Spark Streaming, capas de Data Lake, ajustes de permisos. | *[Enlace a PR #Y]* |
+| **Andres Triana** | `feTtros` | Orquestación en Airflow, GitHub Actions, validaciones DagBag. | *[Enlace a PR #Z]* |
+
+## 10. Enlace al video final
+
+📺 [Ver video de demostración de RapidGo - Variante 7](https://www.google.com/search?q=URL_DEL_VIDEO_AQUI)
