@@ -106,14 +106,14 @@ docker logs rapidgo-airflow | grep -i password
 * **Trabajo futuro:** Migrar los cálculos estáticos hacia alertas dinámicas basadas en modelos de machine learning, implementar particionado de datos lógico por fecha `date=YYYY-MM-DD` en la capa Curated, e integrar herramientas de visualización de datos de terceros.
 ## 9. Tabla de contribuciones
 
-| Integrante | Usuario GitHub | Tareas Principales | PR principal |
+| Integrante | Usuario GitHub | Tareas Principales | Pull Request |
 | --- | --- | --- | --- |
-| **Jeison Sanchez** | `Anorack123456789` | Diseño de arquitectura base, Crear Docker Compose, Configuracion Kafka | *[[Enlace a PR #22]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pull/22)* |
-| **Jaime Florez** | `DipUwU` | Pipeline de Spark Streaming, Definicion contrato JSON, Creacion DAG | *[[Enlace a PR #36]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pull/36)* |
-| **Andres Triana** | `feTtros` | Creacion Tablero KanBan, Productor de eventos, Configuracion CI.yml | *[[Enlace a PR #29]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pull/29)* |
+| **Jeison Sanchez** | `Anorack123456789` | Diseño de arquitectura base, Crear Docker Compose, Configuracion Kafka | *[[Enlace a PRs]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pulls?q=is%3Apr+author%3AAnorack123456789)* |
+| **Jaime Florez** | `DipUwU` | Pipeline de Spark Streaming, Definicion contrato JSON, Creacion DAG | *[[Enlace a PRs]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pulls?q=is%3Apr+author%3ADipUwU)* |
+| **Andres Triana** | `feTtros` | Creacion Tablero KanBan, Productor de eventos, Configuracion CI.yml | *[[Enlace a PRs]](https://github.com/Anorack123456789/RapidGo_Customer_Experience/pulls?q=is%3Apr+author%3AfeTtros)* |
 ## 10. Ejecuciones manuales Flujo CI.yml
 [Ejecuciones manuales](https://github.com/Anorack123456789/RapidGo_Customer_Experience/actions?query=event%3Aworkflow_dispatch)
 
 ## 11. Enlace al video final
 
-[Ver RapidGo - Variante 7](https://youtu.be/u70ZptVX73I)
+[Ver RapidGo - Variante 7](https://youtu.be/E5uYcIupIWE)
