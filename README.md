@@ -116,4 +116,4 @@ docker logs rapidgo-airflow | grep -i password
 
 ## 11. Enlace al video final
 
-[Ver RapidGo - Variante 7](https://youtu.be/u70ZptVX73I)
+[Ver RapidGo - Variante 7](https://youtu.be/E5uYcIupIWE)
